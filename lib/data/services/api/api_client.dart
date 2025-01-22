@@ -57,7 +57,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<List<Destination>>> getDestinations() async {
+  AsyncResult<List<Destination>> getDestinations() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/destination');
@@ -78,7 +78,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<List<Activity>>> getActivityByDestination(String ref) async {
+  AsyncResult<List<Activity>> getActivityByDestination(String ref) async {
     final client = _clientFactory();
     try {
       final request =
@@ -101,7 +101,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<List<BookingApiModel>>> getBookings() async {
+  AsyncResult<List<BookingApiModel>> getBookings() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/booking');
@@ -123,7 +123,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<BookingApiModel>> getBooking(int id) async {
+  AsyncResult<BookingApiModel> getBooking(int id) async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/booking/$id');
@@ -143,7 +143,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<BookingApiModel>> postBooking(BookingApiModel booking) async {
+  AsyncResult<BookingApiModel> postBooking(BookingApiModel booking) async {
     final client = _clientFactory();
     try {
       final request = await client.post(_host, _port, '/booking');
@@ -164,7 +164,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<UserApiModel>> getUser() async {
+  AsyncResult<UserApiModel> getUser() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/user');
@@ -184,7 +184,7 @@ class ApiClient {
     }
   }
 
-  Future<Result<void>> deleteBooking(int id) async {
+  AsyncResult<void> deleteBooking(int id) async {
     final client = _clientFactory();
     try {
       final request = await client.delete(_host, _port, '/booking/$id');
