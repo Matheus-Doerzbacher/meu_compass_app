@@ -1,9 +1,5 @@
-// Copyright 2024 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
 import 'package:meu_compass_app/data/services/api/api_client.dart';
 import 'package:meu_compass_app/data/services/api/model/booking/booking_api_model.dart';
-import 'package:meu_compass_app/domain/models/activity/activity.dart';
 import 'package:meu_compass_app/domain/models/booking/booking.dart';
 import 'package:meu_compass_app/domain/models/booking/booking_summary.dart';
 import 'package:meu_compass_app/domain/models/destination/destination.dart';
