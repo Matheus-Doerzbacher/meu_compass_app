@@ -1,5 +1,9 @@
 import 'package:meu_compass_app/data/repositories/auth/auth_repository.dart';
 import 'package:meu_compass_app/data/repositories/auth/auth_repository_remote.dart';
+import 'package:meu_compass_app/data/repositories/booking/booking_repository.dart';
+import 'package:meu_compass_app/data/repositories/booking/booking_repository_remote.dart';
+import 'package:meu_compass_app/data/repositories/user/user_repository.dart';
+import 'package:meu_compass_app/data/repositories/user/user_repository_remote.dart';
 import 'package:meu_compass_app/data/services/api/api_client.dart';
 import 'package:meu_compass_app/data/services/api/auth_api_client.dart';
 import 'package:meu_compass_app/data/services/local/shared_preferences_service.dart';
@@ -24,10 +28,15 @@ List<SingleChildWidget> get providers {
         sharedPreferencesService: context.read(),
       ) as AuthRepository,
     ),
-    // Provider(
-    //   create: (context) => BookingRepository(
-    //     apiClient: context.read(),
-    //   ),
-    // ),
+    Provider(
+      create: (context) => BookingRepositoryRemote(
+        apiClient: context.read(),
+      ) as BookingRepository,
+    ),
+    Provider(
+      create: (context) => UserRepositoryRemote(
+        apiClient: context.read(),
+      ) as UserRepository,
+    ),
   ];
 }

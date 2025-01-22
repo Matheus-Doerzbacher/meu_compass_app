@@ -5,6 +5,7 @@ import 'package:meu_compass_app/config/dependencies.dart';
 import 'package:meu_compass_app/ui/core/themes/theme.dart';
 import 'package:meu_compass_app/ui/core/ui/scroll_behavior.dart';
 import 'package:provider/provider.dart';
+import 'routing/router.dart';
 
 void main() {
   Logger.root.level = Level.ALL;
@@ -21,6 +22,7 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
       localizationsDelegates: [
         GlobalWidgetsLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -29,7 +31,7 @@ class MainApp extends StatelessWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      // routerConfig: router,
+      routerConfig: router(context.read()),
     );
   }
 }
