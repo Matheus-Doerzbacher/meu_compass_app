@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:meu_compass_app/config/dependencies.dart';
+import 'package:meu_compass_app/ui/core/themes/theme.dart';
+import 'package:meu_compass_app/ui/core/ui/scroll_behavior.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -18,7 +21,15 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      localizationsDelegates: [],
+      localizationsDelegates: [
+        GlobalWidgetsLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+      ],
+      scrollBehavior: AppCustomScrollBehavior(),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      // routerConfig: router,
     );
   }
 }
