@@ -22,7 +22,7 @@ class LoginViewModel {
       password: password,
     );
     if (result is Failure) {
-      _log.warning('Login failed! $result');
+      _log.warning('Login failed! ${result.exceptionOrNull()}');
     }
     return result;
   }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:logging/logging.dart';
 import 'package:meu_compass_app/config/dependencies.dart';
+import 'package:meu_compass_app/ui/core/localization/applocalization.dart';
 import 'package:meu_compass_app/ui/core/themes/theme.dart';
 import 'package:meu_compass_app/ui/core/ui/scroll_behavior.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +27,7 @@ class MainApp extends StatelessWidget {
       localizationsDelegates: [
         GlobalWidgetsLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
+        AppLocalizationDelegate()
       ],
       scrollBehavior: AppCustomScrollBehavior(),
       theme: AppTheme.lightTheme,
