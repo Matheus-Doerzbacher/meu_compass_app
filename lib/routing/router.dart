@@ -4,6 +4,8 @@ import 'package:meu_compass_app/data/repositories/auth/auth_repository.dart';
 import 'package:meu_compass_app/routing/routes.dart';
 import 'package:meu_compass_app/ui/auth/login/view_models/login_viewmodel.dart';
 import 'package:meu_compass_app/ui/auth/login/widgets/login_screen.dart';
+import 'package:meu_compass_app/ui/booking/view_models/booking_viewmodel.dart';
+import 'package:meu_compass_app/ui/booking/widgets/booking_screen.dart';
 import 'package:meu_compass_app/ui/home/view_models/home_viewmodel.dart';
 import 'package:meu_compass_app/ui/home/widgets/home_screen.dart';
 import 'package:provider/provider.dart';
@@ -37,12 +39,23 @@ GoRouter router(
             return HomeScreen(viewModel: viewModel);
           },
           routes: [
-            // GoRoute(
-            //   path: Routes.bookingRelative,
-            //   builder: (context, state) {
-            //     final viewModel = BookingViewModel
-            //   },
-            // )
+            GoRoute(
+              path: Routes.bookingRelative,
+              builder: (context, state) {
+                final viewModel = BookingViewModel(
+                  bookingCreateUseCase: context.read(),
+                  bookingShareUseCase: context.read(),
+                  itineraryConfigRepository: context.read(),
+                  bookingRepository: context.read(),
+                );
+
+                viewModel.createBooking.execute();
+
+                return BookingScreen(
+                  viewModel: viewModel,
+                );
+              },
+            )
           ],
         )
       ],
