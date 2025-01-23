@@ -3,28 +3,28 @@
 // found in the LICENSE file.
 
 import 'package:logging/logging.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPreferencesService {
   static const _tokenKey = 'TOKEN';
   final _log = Logger('SharedPreferencesService');
 
-  AsyncResult<String> fetchToken() async {
+  Future<Result<String>> fetchToken() async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
       final token = sharedPreferences.getString(_tokenKey);
       _log.finer('Got token from SharedPreferences');
       return token != null
-          ? Success(token)
-          : Failure(Exception('Token not found'));
+          ? Result.ok(token)
+          : Result.error(Exception('Token not found'));
     } on Exception catch (e) {
       _log.warning('Failed to get token', e);
-      return Failure(e);
+      return Result.error(e);
     }
   }
 
-  AsyncResult<Unit> saveToken(String? token) async {
+  Future<Result<void>> saveToken(String? token) async {
     try {
       final sharedPreferences = await SharedPreferences.getInstance();
       if (token == null) {
@@ -34,10 +34,10 @@ class SharedPreferencesService {
         _log.finer('Replaced token');
         await sharedPreferences.setString(_tokenKey, token);
       }
-      return const Success(unit);
+      return const Result.ok(null);
     } on Exception catch (e) {
       _log.warning('Failed to set token', e);
-      return Failure(e);
+      return Result.error(e);
     }
   }
 }

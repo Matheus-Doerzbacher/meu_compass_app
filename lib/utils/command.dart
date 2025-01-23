@@ -5,10 +5,11 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:result_dart/result_dart.dart';
 
-typedef CommandAction0<T> = AsyncResult<Object> Function();
-typedef CommandAction1<T, A> = AsyncResult<Object> Function(A);
+import 'result.dart';
+
+typedef CommandAction0<T> = Future<Result<T>> Function();
+typedef CommandAction1<T, A> = Future<Result<T>> Function(A);
 
 /// Facilitates interaction with a ViewModel.
 ///
@@ -31,13 +32,13 @@ abstract class Command<T> extends ChangeNotifier {
   /// True when the action is running.
   bool get running => _running;
 
-  Result<Object>? _result;
+  Result<T>? _result;
 
   /// true if action completed with error
-  bool get error => _result is Failure;
+  bool get error => _result is Error;
 
   /// true if action completed successfully
-  bool get completed => _result is Success;
+  bool get completed => _result is Ok;
 
   /// Get last action result
   Result? get result => _result;

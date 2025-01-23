@@ -3,8 +3,9 @@ import 'package:meu_compass_app/data/repositories/auth/auth_repository.dart';
 import 'package:meu_compass_app/data/services/api/api_client.dart';
 import 'package:meu_compass_app/data/services/api/auth_api_client.dart';
 import 'package:meu_compass_app/data/services/api/model/login_request/login_request.dart';
+import 'package:meu_compass_app/data/services/api/model/login_response/login_response.dart';
 import 'package:meu_compass_app/data/services/local/shared_preferences_service.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 
 class AuthRepositoryRemote extends AuthRepository {
   AuthRepositoryRemote({
@@ -28,18 +29,16 @@ class AuthRepositoryRemote extends AuthRepository {
   /// Fetch token from shared preferences
   Future<void> _fetch() async {
     final result = await _sharedPreferencesService.fetchToken();
-    result.fold(
-      (token) {
-        _authToken = token;
+    switch (result) {
+      case Ok<String>():
+        _authToken = result.value;
         _isAuthenticated = true;
-      },
-      (error) {
+      case Error<String>():
         _log.severe(
           'Failed to fetch Token from SharedPreferences',
-          error,
+          result.error,
         );
-      },
-    );
+    }
   }
 
   @override
@@ -54,7 +53,7 @@ class AuthRepositoryRemote extends AuthRepository {
   }
 
   @override
-  AsyncResult<Unit> login({
+  Future<Result<void>> login({
     required String email,
     required String password,
   }) async {
@@ -65,32 +64,32 @@ class AuthRepositoryRemote extends AuthRepository {
           password: password,
         ),
       );
-      return await result.fold(
-        (loginResponse) async {
+
+      switch (result) {
+        case Ok<LoginResponse>():
           _log.info('User logged in');
           // Set auth status
           _isAuthenticated = true;
-          _authToken = loginResponse.token;
+          _authToken = result.value.token;
           // Store in Shared preferences
-          return await _sharedPreferencesService.saveToken(loginResponse.token);
-        },
-        (error) {
-          _log.warning('Error logging in: $error');
-          return Failure(error);
-        },
-      );
+          return await _sharedPreferencesService.saveToken(result.value.token);
+        case Error<LoginResponse>():
+          _log.warning('Error logging in: ${result.error}');
+          return Result.error(result.error);
+      }
     } finally {
       notifyListeners();
     }
   }
 
   @override
-  AsyncResult<Unit> logout() async {
+  Future<Result<void>> logout() async {
     _log.info('User logged out');
     try {
       // Clear stored auth token
       final result = await _sharedPreferencesService.saveToken(null);
-      if (result is Failure) {
+
+      if (result is Error<void>) {
         _log.severe('Failed to clear stored auth token');
       }
 

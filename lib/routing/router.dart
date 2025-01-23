@@ -36,6 +36,14 @@ GoRouter router(
             );
             return HomeScreen(viewModel: viewModel);
           },
+          routes: [
+            // GoRoute(
+            //   path: Routes.bookingRelative,
+            //   builder: (context, state) {
+            //     final viewModel = BookingViewModel
+            //   },
+            // )
+          ],
         )
       ],
     );

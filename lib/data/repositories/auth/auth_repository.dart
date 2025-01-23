@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 
 abstract class AuthRepository extends ChangeNotifier {
   Future<bool> get isAuthenticated;
 
-  AsyncResult<Unit> login({
+  Future<Result<void>> login({
     required String email,
     required String password,
   });
 
-  AsyncResult<Unit> logout();
+  Future<Result<void>> logout();
 }

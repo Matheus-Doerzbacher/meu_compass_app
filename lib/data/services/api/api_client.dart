@@ -6,7 +6,7 @@ import 'package:meu_compass_app/data/services/api/model/user/user_api_model.dart
 import 'package:meu_compass_app/domain/models/activity/activity.dart';
 import 'package:meu_compass_app/domain/models/continent/continent.dart';
 import 'package:meu_compass_app/domain/models/destination/destination.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 
 typedef AuthHeaderProvider = String? Function();
 
@@ -36,7 +36,7 @@ class ApiClient {
     }
   }
 
-  AsyncResult<List<Continent>> getContinents() async {
+  Future<Result<List<Continent>>> getContinents() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/continent');
@@ -45,19 +45,19 @@ class ApiClient {
       if (response.statusCode == 200) {
         final stringData = await response.transform(utf8.decoder).join();
         final json = jsonDecode(stringData) as List<dynamic>;
-        return Success(
+        return Result.ok(
             json.map((element) => Continent.fromJson(element)).toList());
       } else {
-        return Failure(HttpException("Invalid response"));
+        return Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<List<Destination>> getDestinations() async {
+  Future<Result<List<Destination>>> getDestinations() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/destination');
@@ -66,19 +66,19 @@ class ApiClient {
       if (response.statusCode == 200) {
         final stringData = await response.transform(utf8.decoder).join();
         final json = jsonDecode(stringData) as List<dynamic>;
-        return Success(
+        return Result.ok(
             json.map((element) => Destination.fromJson(element)).toList());
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<List<Activity>> getActivityByDestination(String ref) async {
+  Future<Result<List<Activity>>> getActivityByDestination(String ref) async {
     final client = _clientFactory();
     try {
       final request =
@@ -90,18 +90,18 @@ class ApiClient {
         final json = jsonDecode(stringData) as List<dynamic>;
         final activities =
             json.map((element) => Activity.fromJson(element)).toList();
-        return Success(activities);
+        return Result.ok(activities);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<List<BookingApiModel>> getBookings() async {
+  Future<Result<List<BookingApiModel>>> getBookings() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/booking');
@@ -112,18 +112,18 @@ class ApiClient {
         final json = jsonDecode(stringData) as List<dynamic>;
         final bookings =
             json.map((element) => BookingApiModel.fromJson(element)).toList();
-        return Success(bookings);
+        return Result.ok(bookings);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<BookingApiModel> getBooking(int id) async {
+  Future<Result<BookingApiModel>> getBooking(int id) async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/booking/$id');
@@ -132,18 +132,18 @@ class ApiClient {
       if (response.statusCode == 200) {
         final stringData = await response.transform(utf8.decoder).join();
         final booking = BookingApiModel.fromJson(jsonDecode(stringData));
-        return Success(booking);
+        return Result.ok(booking);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<BookingApiModel> postBooking(BookingApiModel booking) async {
+  Future<Result<BookingApiModel>> postBooking(BookingApiModel booking) async {
     final client = _clientFactory();
     try {
       final request = await client.post(_host, _port, '/booking');
@@ -153,18 +153,18 @@ class ApiClient {
       if (response.statusCode == 201) {
         final stringData = await response.transform(utf8.decoder).join();
         final booking = BookingApiModel.fromJson(jsonDecode(stringData));
-        return Success(booking);
+        return Result.ok(booking);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<UserApiModel> getUser() async {
+  Future<Result<UserApiModel>> getUser() async {
     final client = _clientFactory();
     try {
       final request = await client.get(_host, _port, '/user');
@@ -173,31 +173,31 @@ class ApiClient {
       if (response.statusCode == 200) {
         final stringData = await response.transform(utf8.decoder).join();
         final user = UserApiModel.fromJson(jsonDecode(stringData));
-        return Success(user);
+        return Result.ok(user);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }
   }
 
-  AsyncResult<void> deleteBooking(int id) async {
+  Future<Result<void>> deleteBooking(int id) async {
     final client = _clientFactory();
     try {
       final request = await client.delete(_host, _port, '/booking/$id');
       await _authHeader(request.headers);
       final response = await request.close();
-      // Response 204 "No Content", delete was successful
+      // Response 204 "No Content", delete was Result.okful
       if (response.statusCode == 204) {
-        return const Success(Unit);
+        return const Result.ok(null);
       } else {
-        return const Failure(HttpException("Invalid response"));
+        return const Result.error(HttpException("Invalid response"));
       }
     } on Exception catch (error) {
-      return Failure(error);
+      return Result.error(error);
     } finally {
       client.close();
     }

@@ -2,6 +2,8 @@ import 'package:meu_compass_app/data/repositories/auth/auth_repository.dart';
 import 'package:meu_compass_app/data/repositories/auth/auth_repository_remote.dart';
 import 'package:meu_compass_app/data/repositories/booking/booking_repository.dart';
 import 'package:meu_compass_app/data/repositories/booking/booking_repository_remote.dart';
+import 'package:meu_compass_app/data/repositories/itinerary_config/itinerary_config_repository.dart';
+import 'package:meu_compass_app/data/repositories/itinerary_config/itinerary_config_repository_remote.dart';
 import 'package:meu_compass_app/data/repositories/user/user_repository.dart';
 import 'package:meu_compass_app/data/repositories/user/user_repository_remote.dart';
 import 'package:meu_compass_app/data/services/api/api_client.dart';
@@ -20,6 +22,9 @@ List<SingleChildWidget> get providers {
     ),
     Provider(
       create: (context) => SharedPreferencesService(),
+    ),
+    Provider.value(
+      value: ItineraryConfigRepositoryRemote() as ItineraryConfigRepository,
     ),
     ChangeNotifierProvider(
       create: (context) => AuthRepositoryRemote(

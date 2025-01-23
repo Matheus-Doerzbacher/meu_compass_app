@@ -5,7 +5,7 @@ import 'package:meu_compass_app/data/repositories/user/user_repository.dart';
 import 'package:meu_compass_app/domain/models/booking/booking_summary.dart';
 import 'package:meu_compass_app/domain/models/user/user.dart';
 import 'package:meu_compass_app/utils/command.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 
 class HomeViewModel extends ChangeNotifier {
   HomeViewModel({
@@ -31,25 +31,27 @@ class HomeViewModel extends ChangeNotifier {
 
   User? get user => _user;
 
-  AsyncResult _load() async {
+  Future<Result> _load() async {
     try {
       final result = await _bookingRepository.getBookingsList();
-      result.fold((bookingsData) {
-        _bookings = bookingsData;
-        _log.fine('Loaded bookings');
-      }, (error) {
-        _log.warning('Failed to load bookings', error);
-        return Failure(error);
-      });
+      switch (result) {
+        case Ok<List<BookingSummary>>():
+          _bookings = result.value;
+          _log.fine('Loaded bookings');
+        case Error<List<BookingSummary>>():
+          _log.warning('Failed to load bookings', result.error);
+          return Result.error(result.error);
+      }
 
       final userResult = await _userRepository.getUser();
-      userResult.fold(
-        (userData) {
-          _user = userData;
+
+      switch (userResult) {
+        case Ok<User>():
+          _user = userResult.value;
           _log.fine('Loaded user');
-        },
-        (error) => _log.warning('Failed to load user', error),
-      );
+        case Error<User>():
+          _log.warning('Failed to load user', userResult.error);
+      }
 
       return userResult;
     } finally {
@@ -57,28 +59,29 @@ class HomeViewModel extends ChangeNotifier {
     }
   }
 
-  AsyncResult<Unit> _deleteBooking(int id) async {
+  Future<Result<void>> _deleteBooking(int id) async {
     try {
       final result = await _bookingRepository.delete(id);
-      result.fold((_) {
-        _log.fine('Deleted booking $id');
-      }, (error) {
-        _log.warning('Failed to delete booking $id', error);
-        return Failure(error);
-      });
+      switch (result) {
+        case Ok<void>():
+          _log.fine('Deleted booking $id');
+        case Error<void>():
+          _log.warning('Failed to delete booking $id', result.error);
+          return Result.error(result.error);
+      }
 
       final resultLoadBookings = await _bookingRepository.getBookingsList();
-      return resultLoadBookings.fold(
-        (bookingsData) {
-          _bookings = bookingsData;
+
+      switch (resultLoadBookings) {
+        case Ok<List<BookingSummary>>():
+          _bookings = resultLoadBookings.value;
           _log.fine('Loaded bookings');
-          return Success(unit);
-        },
-        (error) {
-          _log.warning('Failed to load bookings', error);
-          return Failure(error);
-        },
-      );
+        case Error<List<BookingSummary>>():
+          _log.warning('Failed to load bookings', resultLoadBookings.error);
+          return resultLoadBookings;
+      }
+
+      return resultLoadBookings;
     } finally {
       notifyListeners();
     }

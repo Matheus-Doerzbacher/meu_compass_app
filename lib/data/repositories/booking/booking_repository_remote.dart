@@ -1,9 +1,10 @@
 import 'package:meu_compass_app/data/services/api/api_client.dart';
 import 'package:meu_compass_app/data/services/api/model/booking/booking_api_model.dart';
+import 'package:meu_compass_app/domain/models/activity/activity.dart';
 import 'package:meu_compass_app/domain/models/booking/booking.dart';
 import 'package:meu_compass_app/domain/models/booking/booking_summary.dart';
 import 'package:meu_compass_app/domain/models/destination/destination.dart';
-import 'package:result_dart/result_dart.dart';
+import 'package:meu_compass_app/utils/result.dart';
 
 import 'booking_repository.dart';
 
@@ -17,7 +18,7 @@ class BookingRepositoryRemote implements BookingRepository {
   List<Destination>? _cachedDestinations;
 
   @override
-  AsyncResult<void> createBooking(Booking booking) async {
+  Future<Result<void>> createBooking(Booking booking) async {
     try {
       final bookingApiModel = BookingApiModel(
         startDate: booking.startDate,
@@ -29,23 +30,35 @@ class BookingRepositoryRemote implements BookingRepository {
       );
       return _apiClient.postBooking(bookingApiModel);
     } on Exception catch (e) {
-      return Failure(e);
+      return Result.error(e);
     }
   }
 
   @override
-  AsyncResult<Booking> getBooking(int id) async {
+  Future<Result<Booking>> getBooking(int id) async {
     try {
       // Get booking by ID from server
       final resultBooking = await _apiClient.getBooking(id);
 
-      final booking = resultBooking.getOrThrow();
+      switch (resultBooking) {
+        case Error<BookingApiModel>():
+          return Result.error(resultBooking.error);
+        case Ok<BookingApiModel>():
+      }
+
+      final booking = resultBooking.value;
 
       // Load destinations if not loaded yet
       if (_cachedDestinations == null) {
         final resultDestination = await _apiClient.getDestinations();
 
-        _cachedDestinations = resultDestination.getOrThrow();
+        switch (resultDestination) {
+          case Error<List<Destination>>():
+            return Result.error(resultDestination.error);
+          case Ok<List<Destination>>():
+        }
+
+        _cachedDestinations = resultDestination.value;
       }
 
       // Get destination for booking
@@ -55,12 +68,17 @@ class BookingRepositoryRemote implements BookingRepository {
       final resultActivities =
           await _apiClient.getActivityByDestination(destination.ref);
 
-      final activities = resultActivities
-          .getOrThrow()
+      switch (resultActivities) {
+        case Error<List<Activity>>():
+          return Result.error(resultActivities.error);
+        case Ok<List<Activity>>():
+      }
+
+      final activities = resultActivities.value
           .where((activity) => booking.activitiesRef.contains(activity.ref))
           .toList();
 
-      return Success(
+      return Result.ok(
         Booking(
           id: booking.id,
           startDate: booking.startDate,
@@ -70,38 +88,43 @@ class BookingRepositoryRemote implements BookingRepository {
         ),
       );
     } on Exception catch (e) {
-      return Failure(e);
+      return Result.error(e);
     }
   }
 
   @override
-  AsyncResult<List<BookingSummary>> getBookingsList() async {
+  Future<Result<List<BookingSummary>>> getBookingsList() async {
     try {
       final result = await _apiClient.getBookings();
 
-      return result.fold((bookingsApi) {
-        return Success(
-          bookingsApi
-              .map((bookingApi) => BookingSummary(
-                    id: bookingApi.id!,
-                    name: bookingApi.name,
-                    startDate: bookingApi.startDate,
-                    endDate: bookingApi.endDate,
-                  ))
-              .toList(),
-        );
-      }, (error) => Failure(error));
+      switch (result) {
+        case Ok<List<BookingApiModel>>():
+          final bookingsApi = result.value;
+
+          return Result.ok(bookingsApi
+              .map(
+                (bookingApi) => BookingSummary(
+                  id: bookingApi.id!,
+                  name: bookingApi.name,
+                  startDate: bookingApi.startDate,
+                  endDate: bookingApi.endDate,
+                ),
+              )
+              .toList());
+        case Error<List<BookingApiModel>>():
+          return Result.error(result.error);
+      }
     } on Exception catch (e) {
-      return Failure(e);
+      return Result.error(e);
     }
   }
 
   @override
-  AsyncResult<void> delete(int id) async {
+  Future<Result<void>> delete(int id) async {
     try {
       return _apiClient.deleteBooking(id);
     } on Exception catch (e) {
-      return Failure(e);
+      return Result.error(e);
     }
   }
 }
